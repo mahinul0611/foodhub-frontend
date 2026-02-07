@@ -1,16 +1,17 @@
-import { ThemeProvider } from "@/components/providers/theme-provider"
-import { Toaster } from "@/components/ui/sonner"
-import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import "./globals.css"
+import { ThemeProvider } from "@/components/providers/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FoodHub | Order Delicious Meals",
-  description: "Best food delivery service",
+  title: "FoodHub",
+  description: "Delicious meals delivered",
 }
 
+// NOTICE: Ensure "export default" is exactly here
 export default function RootLayout({
   children,
 }: {
@@ -26,7 +27,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster /> {/* Eta API Error dekhate kaje lagbe */}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
