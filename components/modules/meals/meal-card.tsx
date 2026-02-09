@@ -1,42 +1,68 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Star } from "lucide-react"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { Meal } from "@/types";
+import { ShoppingCart, Eye } from "lucide-react";
 
-export function MealCard({ title, image, price, rating, category }: any) {
+interface MealCardProps {
+  meal: Meal;
+}
+
+export default function MealCard({ meal }: MealCardProps) {
   return (
-    <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 border-border/50">
-      <CardHeader className="p-0">
-        <div className="relative h-48 w-full overflow-hidden">
-          <Image
-            src={image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"} // Placeholder
-            alt={title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <Badge className="absolute top-2 right-2 bg-background/80 text-foreground backdrop-blur-md hover:bg-background/90">
-            {category}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="p-4 space-y-2">
-        <div className="flex justify-between items-start">
-            <h3 className="font-bold text-lg line-clamp-1">{title}</h3>
-            <div className="flex items-center gap-1 text-yellow-500 text-sm font-medium">
-                <Star className="h-4 w-4 fill-current" />
-                {rating}
+    <Card className="group flex flex-col h-full overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 rounded-xl bg-white">
+      
+      {/* ১. ইমেজ সেকশন (ফিক্সড হাইট) */}
+      <div className="relative h-52 w-full bg-gray-100 overflow-hidden">
+         {meal.images?.[0] ? (
+            <img 
+              src={meal.images[0]} 
+              alt={meal.name} 
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+            />
+         ) : (
+            <div className="h-full w-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
+               <span className="text-4xl">🍱</span>
+               <span className="text-sm mt-2">No Image</span>
             </div>
-        </div>
-        <p className="text-muted-foreground text-sm line-clamp-2">
-          Delicious meal prepared with fresh ingredients and special spices.
+         )}
+         
+         {/* প্রাইস ব্যাজ (ইমেজের ওপর) */}
+         <div className="absolute top-3 right-3">
+            <Badge className="bg-white/90 text-orange-600 hover:bg-white font-bold text-md px-3 py-1 shadow-sm backdrop-blur-sm">
+              ৳ {meal.price}
+            </Badge>
+         </div>
+      </div>
+
+      {/* ২. কন্টেন্ট সেকশন */}
+      <CardHeader className="p-4 pb-0">
+        <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-orange-600 transition-colors">
+          {meal.name}
+        </h3>
+        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+           Category: {meal.categoryId ? "Food" : "N/A"}
+        </p>
+      </CardHeader>
+      
+      <CardContent className="p-4 flex-grow">
+        <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+          {meal.description}
         </p>
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex items-center justify-between">
-        <span className="font-bold text-lg text-primary">৳ {price}</span>
-        <Button size="sm">Add to Cart</Button>
+
+      {/* ৩. ফুটার / বাটন সেকশন */}
+      <CardFooter className="p-4 pt-0 grid grid-cols-2 gap-3 mt-auto">
+        <Link href={`/meals/${meal.id}`} className="w-full">
+          <Button variant="outline" className="w-full gap-2 hover:bg-gray-100 border-gray-300">
+            <Eye size={16} /> Details
+          </Button>
+        </Link>
+        <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white gap-2 shadow-md hover:shadow-lg transition-all">
+          <ShoppingCart size={16} /> Add
+        </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

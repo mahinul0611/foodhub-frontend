@@ -20,7 +20,7 @@ export function Navbar() {
         <nav className="hidden md:flex gap-6 items-center">
           <Link href="/" className="font-medium hover:text-primary">Home</Link>
           <Link href="/meals" className="font-medium hover:text-primary">Meals</Link>
-          <Link href="/providers" className="font-medium hover:text-primary">Providers</Link>
+          <Link href="/provider" className="font-medium hover:text-primary">Providers</Link>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -31,7 +31,9 @@ export function Navbar() {
           
           <div className="hidden md:flex gap-2">
             <Link href="/login"><Button variant="ghost">Login</Button></Link>
-            <Button>Sign Up</Button>
+            <Link href="/register">
+    <Button>Sign Up</Button>
+  </Link>
           </div>
 
           <Sheet>

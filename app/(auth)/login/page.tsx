@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import Cookies from "js-cookie"
 
-// 1. Zod Schema
+// Zod Schema
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -20,7 +21,6 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const router = useRouter()
 
-  // 2. Form Setup (Adapter removed to prevent crash)
   const form = useForm({
     defaultValues: {
       email: "",
@@ -35,17 +35,43 @@ export default function LoginPage() {
         })
 
         const result = await res.json()
-        if (!res.ok) throw new Error(result.message || "Login failed")
+        
+        // ডিবাগিং এর জন্য কনসোল লগ
+        console.log("Server Response:", result);
 
-        if (result.data?.accessToken) {
-          localStorage.setItem("accessToken", result.data.accessToken)
-          document.cookie = `accessToken=${result.data.accessToken}; path=/;`
+        if (!res.ok) {
+           throw new Error(result.message || "Login failed")
         }
 
-        toast.success("Login Successful!")
-        router.push("/")
-        router.refresh()
+        // ✅ ফিক্স ১: পোস্টম্যান অনুযায়ী সরাসরি 'token' নেওয়া
+        const token = result.token; 
+        
+        // ✅ ফিক্স ২: ইউজার রোল 'user' অবজেক্টের ভেতর থেকে নেওয়া
+        const userRole = result.user?.role;
+
+        if (token) {
+          // কুকিতে টোকেন সেট করা (নাম 'accessToken' রাখছি যাতে অ্যাপের বাকি জায়গায় কাজ করে)
+          Cookies.set("accessToken", token, { expires: 7, path: '/' }) 
+          
+          toast.success("Login Successful! 🎉")
+          
+          router.refresh()
+          
+          // রোল অনুযায়ী রিডাইরেক্ট
+          if (userRole === "PROVIDER") {
+             router.push("/provider")
+          } else if (userRole === "USER") {
+             router.push("/customer")
+          } else {
+             router.push("/")
+          }
+        } else {
+          console.error("Token missing. Response was:", result);
+          toast.error("Login successful but token missing in response!")
+        }
+
       } catch (error: any) {
+        console.error("Login Error:", error)
         toast.error(error.message || "Something went wrong")
       }
     },
@@ -67,7 +93,6 @@ export default function LoginPage() {
             }}
             className="grid gap-4"
           >
-            {/* Email Field with Manual Zod Check */}
             <form.Field
               name="email"
               validators={{
@@ -94,7 +119,6 @@ export default function LoginPage() {
               )}
             />
 
-            {/* Password Field */}
             <form.Field
               name="password"
               validators={{
